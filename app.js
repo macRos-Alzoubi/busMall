@@ -29,11 +29,9 @@ const render = function(){
   midImgNumber = uniqueNumber(generateRandomNumber(),leftImgNumber, rightImgNumber);
   rightImgNumber = uniqueNumber(generateRandomNumber(),leftImgNumber, midImgNumber);
 
-
   leftImgElement.src = Product.productList[leftImgNumber].filePath;
   midImgElement.src = Product.productList[midImgNumber].filePath;
   rightImgElement.src = Product.productList[rightImgNumber].filePath;
-
 
   Product.productList[leftImgNumber].shownOnScreen++;
   Product.productList[midImgNumber].shownOnScreen++;
@@ -90,21 +88,13 @@ const clickEventHandler = function(event){
   if(targetElementClassList.contains('left-img') || targetElementClassList.contains('mid-img') || targetElementClassList.contains('right-img')){
     if(attempt < maxAttempts){
       attempt++;
-      if(targetElementClassList.contains('left-img')){
+
+      if(targetElementClassList.contains('left-img'))
         Product.productList[leftImgNumber].clicked++;
-        console.log('leftImg');
-        console.log( Product.productList[leftImgNumber]);
-      }
-      else if(targetElementClassList.contains('mid-img')){
+      else if(targetElementClassList.contains('mid-img'))
         Product.productList[midImgNumber].clicked++;
-        console.log('midImg');
-        console.log(Product.productList[midImgNumber]);
-      }
-      else{
+      else
         Product.productList[rightImgNumber].clicked++;
-        console.log('rightImg');
-        console.log(Product.productList[rightImgNumber]);
-      }
 
       if(attempt !== maxAttempts)
         render();
@@ -124,4 +114,3 @@ resultBTN.addEventListener('click', function(){
 });
 
 render();
-
