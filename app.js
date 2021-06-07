@@ -61,14 +61,9 @@ const render = function(){
 
 };
 
-const setProductVotesList = function(){
+const setProductVotesAndViewsLists = function(){
   Product.productList.forEach(product =>{
     productVotsList.push(product.clicked);
-  });
-};
-
-const setProductViewsList = function(){
-  Product.productList.forEach(product =>{
     productViewsList.push(product.shownOnScreen);
   });
 };
@@ -194,8 +189,7 @@ const clickEventHandler = function(event){
     }else{
       imgGalary.removeEventListener('click', clickEventHandler);
       resultBTN.removeAttribute('disabled');
-      setProductVotesList();
-      setProductViewsList();
+      setProductVotesAndViewsLists();
     }
   }
 
