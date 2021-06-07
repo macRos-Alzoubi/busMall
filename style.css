@@ -55,18 +55,11 @@ main{
     cursor: pointer;
 }
 
-.result-list{
-    width: 25%;
+.result-chart{
+    width: 95%;
     margin: 40px auto;
-    list-style: none;
-    font-size: 110%;
-    color: #454545;
 }
 
-.result-list li{
-    text-align: left;
-    margin-bottom: 7px;
-}
 
 footer{
     text-align: center;

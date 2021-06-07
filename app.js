@@ -3,7 +3,12 @@ let leftImgNumber = 0,
   midImgNumber = 0,
   rightImgNumber = 0,
   attempt = 0,
-  maxAttempts = 25;
+  maxAttempts = 25,
+  NumberOfchecks = 0,
+  toNotRepeat = [],
+  productNameList = [],
+  productVotsList = [],
+  productViewsList = [];
 
 
 const imgGalary = document.querySelector('.imgs-container');
@@ -11,13 +16,24 @@ const leftImgElement = document.querySelector('.left-img');
 const midImgElement = document.querySelector('.mid-img');
 const rightImgElement = document.querySelector('.right-img');
 const resultBTN = document.querySelector('.result-btn');
-const resultList = document.querySelector('.result-list');
+const resultChart = document.querySelector('.result-chart').getContext('2d');
 
-const uniqueNumber = function(a, b, c){
-  if(a !== b && a!== c)
+
+const uniqueImgNumber = function(a, b, c){
+  if(attempt === 0 && (a !== b && a!== c))
     return a;
+  else if( attempt > 0 && (a !== b && a!== c) && !toNotRepeat.includes(`${Product.productList[a].filePath}`) ){
+
+    NumberOfchecks++;
+    if(NumberOfchecks === 3){
+      NumberOfchecks = 0;
+      toNotRepeat = [];
+    }
+
+    return a;
+  }
   else
-    return uniqueNumber(generateRandomNumber(), b, c);
+    return uniqueImgNumber(generateRandomNumber(), b, c);
 };
 
 const generateRandomNumber = function(){
@@ -25,9 +41,15 @@ const generateRandomNumber = function(){
 };
 
 const render = function(){
-  leftImgNumber = uniqueNumber(generateRandomNumber(),midImgNumber, rightImgNumber);
-  midImgNumber = uniqueNumber(generateRandomNumber(),leftImgNumber, rightImgNumber);
-  rightImgNumber = uniqueNumber(generateRandomNumber(),leftImgNumber, midImgNumber);
+  if( attempt > 0){
+    toNotRepeat.push(Product.productList[leftImgNumber].filePath);
+    toNotRepeat.push(Product.productList[midImgNumber].filePath);
+    toNotRepeat.push(Product.productList[rightImgNumber].filePath);
+  }
+
+  leftImgNumber = uniqueImgNumber(generateRandomNumber(),midImgNumber, rightImgNumber);
+  midImgNumber = uniqueImgNumber(generateRandomNumber(),leftImgNumber, rightImgNumber);
+  rightImgNumber = uniqueImgNumber(generateRandomNumber(),leftImgNumber, midImgNumber);
 
   leftImgElement.src = Product.productList[leftImgNumber].filePath;
   midImgElement.src = Product.productList[midImgNumber].filePath;
@@ -36,15 +58,83 @@ const render = function(){
   Product.productList[leftImgNumber].shownOnScreen++;
   Product.productList[midImgNumber].shownOnScreen++;
   Product.productList[rightImgNumber].shownOnScreen++;
+
+};
+
+const setProductVotesList = function(){
+  Product.productList.forEach(product =>{
+    productVotsList.push(product.clicked);
+  });
+};
+
+const setProductViewsList = function(){
+  Product.productList.forEach(product =>{
+    productViewsList.push(product.shownOnScreen);
+  });
+};
+
+const createChart = function(){
+  return {
+    type: 'bar',
+    data: {
+      labels: productNameList,
+      datasets: [{
+        label: '# of Votes',
+        data: productVotsList,
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(255, 159, 64, 0.2)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1
+      },{
+        label: '# of Views',
+        data: productViewsList,
+        backgroundColor: [
+          'rgba(255, 99, 132, 0.2)',
+          'rgba(54, 162, 235, 0.2)',
+          'rgba(255, 206, 86, 0.2)',
+          'rgba(75, 192, 192, 0.2)',
+          'rgba(153, 102, 255, 0.2)',
+          'rgba(255, 159, 64, 0.2)'
+        ],
+        borderColor: [
+          'rgba(255, 99, 132, 1)',
+          'rgba(54, 162, 235, 1)',
+          'rgba(255, 206, 86, 1)',
+          'rgba(75, 192, 192, 1)',
+          'rgba(153, 102, 255, 1)',
+          'rgba(255, 159, 64, 1)'
+        ],
+        borderWidth: 1
+      }
+      ]
+    },
+    options: {
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  };
 };
 
 const renderResults = function(){
-  for(let i =0; i < Product.productList.length; i++){
-    let listItem = document.createElement('li');
-    listItem.textContent = `${Product.productList[i].productName} had ${Product.productList[i].clicked} 
-    votes, and was seen ${Product.productList[i].shownOnScreen} times`;
-    resultList.appendChild(listItem);
-  }
+  const chartObj = createChart();
+  // eslint-disable-next-line no-undef
+  new Chart(resultChart, chartObj);
   resultBTN.setAttribute('disabled', 'disabled');
 };
 
@@ -55,6 +145,7 @@ function Product(productName, filePath){
   this.shownOnScreen = 0;
 
   Product.productList.push(this);
+  productNameList.push(this.productName);
 }
 
 Product.productList = [];
@@ -103,6 +194,8 @@ const clickEventHandler = function(event){
     }else{
       imgGalary.removeEventListener('click', clickEventHandler);
       resultBTN.removeAttribute('disabled');
+      setProductVotesList();
+      setProductViewsList();
     }
   }
 
