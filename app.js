@@ -41,6 +41,10 @@ const generateRandomNumber = function(){
 };
 
 const render = function(){
+
+  if(localStorage.getItem('productList'))
+    Product.productList = JSON.parse(localStorage.getItem('productList'));
+
   if( attempt > 0){
     toNotRepeat.push(Product.productList[leftImgNumber].filePath);
     toNotRepeat.push(Product.productList[midImgNumber].filePath);
@@ -59,16 +63,20 @@ const render = function(){
   Product.productList[midImgNumber].shownOnScreen++;
   Product.productList[rightImgNumber].shownOnScreen++;
 
+  localStorage.setItem('productList', JSON.stringify(Product.productList));
 };
 
 const setProductVotesAndViewsLists = function(){
+  if(localStorage.getItem('productList'))
+    Product.productList = JSON.parse(localStorage.getItem('productList'));
+
   Product.productList.forEach(product =>{
     productVotsList.push(product.clicked);
     productViewsList.push(product.shownOnScreen);
   });
 };
 
-const createChart = function(){
+const getChartObj = function(){
   return {
     type: 'bar',
     data: {
@@ -127,7 +135,8 @@ const createChart = function(){
 };
 
 const renderResults = function(){
-  const chartObj = createChart();
+  console.log(localStorage);
+  const chartObj = getChartObj();
   // eslint-disable-next-line no-undef
   new Chart(resultChart, chartObj);
   resultBTN.setAttribute('disabled', 'disabled');
@@ -167,6 +176,9 @@ new Product('water-can', 'img/water-can.jpg');
 new Product('wine-glass', 'img/wine-glass.jpg');
 
 
+if(!localStorage.getItem('productList'))
+  localStorage.setItem('productList', JSON.stringify(Product.productList));
+
 const clickEventHandler = function(event){
   const targetElement = event.target;
   const targetElementClassList = targetElement.classList;
@@ -175,6 +187,9 @@ const clickEventHandler = function(event){
     if(attempt < maxAttempts){
       attempt++;
 
+      if(localStorage.getItem('productList'))
+        Product.productList = JSON.parse(localStorage.getItem('productList'));
+
       if(targetElementClassList.contains('left-img'))
         Product.productList[leftImgNumber].clicked++;
       else if(targetElementClassList.contains('mid-img'))
@@ -182,6 +197,7 @@ const clickEventHandler = function(event){
       else
         Product.productList[rightImgNumber].clicked++;
 
+      localStorage.setItem('productList', JSON.stringify(Product.productList));
       if(attempt !== maxAttempts)
         render();
       else
